@@ -1,4 +1,4 @@
-# Hyperkin N64 Adapter Fix for RetroDeck (Bazzite/Linux)
+# Hyperkin N64 Adapter Fix for RetroDeck on Bazzite Linux
 
 Fixes controller support for the Hyperkin / ShanWan USB N64 controller adapter in RetroDeck and RetroArch on Linux.
 
@@ -123,6 +123,16 @@ No RetroDeck factory reset should be necessary.
 ### Will this work on other Linux distributions?
 
 Probably, but I haven't tested it.
+
+### Why did you make this?
+
+By default, Bazzite doesn't detect the controller properly or any of it inputs in KDE.  See screenshot -  ![Controller Tester Screenshot](kde_controller_settings.png)
+
+By creating an SDL wrapper and then adjusting the Retroarch bindings, the controller will work in Retrodeck menus and Retroarch.  
+
+As an alternative - if you're using something like Rosalie's MUPEN GUI, the buttons can be mapped directly.  That app effectively creates an SDL wrapper when you press the inputs and configure it, but it won't work in Retrodeck/Retroarch.
+
+![n64 controller.png](n64%20controller.png)
 
 ### Are you affiliated with ShanWan or Nintendo?
 

@@ -134,6 +134,24 @@ As an alternative - if you're using something like Rosalie's MUPEN GUI, the butt
 
 ![n64 controller.png](n64%20controller.png)
 
+
+
+### Will it work in console mode?
+
+It didn't work in Retrodeck and it even crashed the KDE controller settings menu with the following error so I didn't have any luck. 
+
+```bash
+❯ systemsettings
+org.kde.libkbolt: Failed to connect to Bolt manager DBus interface: 
+kf.plasma.core: The theme "Vapor" uses the legacy metadata.desktop. Consider contacting the author and asking them update it to use the newer JSON format.
+qt.qpa.services: Failed to register with host portal QDBusError("org.freedesktop.portal.Error.Failed", "Could not register app ID: Connection already associated with an application ID")
+terminate called after throwing an instance of 'std::logic_error'
+  what():  basic_string: construction from null is not valid
+Aborted                    (core dumped) systemsettings
+
+
+```
+
 ### Are you affiliated with ShanWan or Nintendo?
 
 No, just a hobbyist sharing a fix with others.

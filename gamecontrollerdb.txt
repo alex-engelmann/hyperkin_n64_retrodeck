@@ -1,0 +1,27 @@
+# SDL2 Game Controller Mapping — ShanWan/Hyperkin N64 USB Adapter
+#
+# GUID: 03006d4b790000004e95000010010000
+#   0300         = USB bus type
+#   6d4b         = SDL2 internal identifier bytes
+#   7900         = VID 0x0079 (little-endian)
+#   0000         = padding
+#   4e95         = PID 0x954e (little-endian)
+#   000010010000 = version/padding
+#
+# Button/axis mapping (jsdev button numbers):
+#   a:b1             = SDL A       -> physical A (button 1)
+#   b:b2             = SDL B       -> physical B (button 2)
+#   start:b9         = Start       -> button 9
+#   leftshoulder:b7  = L           -> button 7
+#   rightshoulder:b5 = R           -> button 5
+#   lefttrigger:b4   = Z           -> button 4 (Z dual-reports as button + axis)
+#   leftx:a0         = Analog X
+#   lefty:a1         = Analog Y
+#   rightx:a5        = C buttons X -> ABS_RZ (axis 5)
+#   righty:a2        = C buttons Y -> ABS_Z  (axis 2)
+#   dpup:b12         = D-pad up    -> button 12
+#   dpdown:b14       = D-pad down  -> button 14
+#   dpleft:b15       = D-pad left  -> button 15
+#   dpright:b13      = D-pad right -> button 13
+
+03006d4b790000004e95000010010000,ShanWan Hyperkin Adapter,a:b1,b:b2,start:b9,leftshoulder:b7,rightshoulder:b5,lefttrigger:b4,leftx:a0,lefty:a1,rightx:a5,righty:a2,dpup:b12,dpdown:b14,dpleft:b15,dpright:b13,platform:Linux,

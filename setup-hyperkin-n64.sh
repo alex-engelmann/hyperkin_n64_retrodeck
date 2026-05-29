@@ -7,16 +7,18 @@
 #
 # What this script does:
 #   1. Grants RetroDeck access to input devices via Flatpak override
-#   2. Creates a custom SDL2 controller mapping (gamecontrollerdb.txt)
+#   2. Installs the SDL2 controller mapping (gamecontrollerdb.txt)
 #   3. Points RetroDeck at the SDL2 mapping via Flatpak environment override
 #   4. Copies the RetroArch sdl2 autoconfig for correct button mapping
-#   5. Fixes RetroArch's autoconfig directory path
+#   5. Clears RetroArch's manual player 1 bindings
+#   6. Fixes RetroArch's autoconfig directory path
 #
 # Requirements:
 #   - Bazzite (or other Linux distro with Flatpak)
 #   - RetroDeck installed as a Flatpak (net.retrodeck.retrodeck)
 #   - Hyperkin N64 adapter plugged in and set to PC mode
 #   - "ShanWan Hyperkin Adapter.cfg" in the same directory as this script
+#   - "gamecontrollerdb.txt" in the same directory as this script
 #
 # Usage:
 #   chmod +x setup-hyperkin-n64.sh
@@ -35,7 +37,7 @@ info()    { echo -e "${GREEN}[INFO]${NC} $1"; }
 warning() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 error()   { echo -e "${RED}[ERROR]${NC} $1"; exit 1; }
 
-# Directory where this script lives — used to find the cfg file
+# Directory where this script lives — used to find bundled repo files
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # =============================================================================
@@ -52,6 +54,11 @@ fi
 # Check the cfg file is present alongside this script
 if [ ! -f "$SCRIPT_DIR/ShanWan Hyperkin Adapter.cfg" ]; then
     error "'ShanWan Hyperkin Adapter.cfg' not found in $SCRIPT_DIR. Please place it alongside this script."
+fi
+
+# Check the SDL2 mapping file is present alongside this script
+if [ ! -f "$SCRIPT_DIR/gamecontrollerdb.txt" ]; then
+    error "'gamecontrollerdb.txt' not found in $SCRIPT_DIR. Please place it alongside this script."
 fi
 
 # Check adapter is plugged in
@@ -76,50 +83,22 @@ info "Flatpak device override set."
 # Step 2: SDL2 gamecontroller mapping
 # =============================================================================
 
-info "Creating SDL2 gamecontroller mapping..."
+info "Installing SDL2 gamecontroller mapping..."
 
 # The gamecontrollerdb.txt tells SDL2 exactly how to map this adapter's inputs.
 # This is the critical file — without it SDL2 does not correctly expose
 # the adapter's Z trigger and C buttons through the GameController API.
 # Both ES-DE and RetroArch use SDL2, so this mapping applies to both.
 #
-# GUID breakdown: 03006d4b790000004e95000010010000
-#   - 0300         = USB bus type
-#   - 6d4b         = SDL2 internal identifier bytes
-#   - 7900         = VID 0x0079 (little-endian)
-#   - 0000         = padding
-#   - 4e95         = PID 0x954e (little-endian)
-#   - 000010010000 = version/padding
-#
-# Button/axis mapping (jsdev button numbers):
-#   a:b1             = SDL A       -> physical A (button 1)
-#   b:b2             = SDL B       -> physical B (button 2)
-#   start:b9         = Start       -> button 9
-#   leftshoulder:b7  = L           -> button 7
-#   rightshoulder:b5 = R           -> button 5
-#   lefttrigger:b4   = Z           -> button 4 (Z dual-reports as button + axis)
-#   leftx:a0         = Analog X
-#   lefty:a1         = Analog Y
-#   rightx:a5        = C buttons X -> ABS_RZ (axis 5)
-#   righty:a2        = C buttons Y -> ABS_Z  (axis 2)
-#   dpup:b12         = D-pad up    -> button 12
-#   dpdown:b14       = D-pad down  -> button 14
-#   dpleft:b15       = D-pad left  -> button 15
-#   dpright:b13      = D-pad right -> button 13
+# See gamecontrollerdb.txt in this repo for the full mapping with comments.
 
 GAMECONTROLLERDB_DIR="$HOME/.var/app/net.retrodeck.retrodeck/config/ES-DE"
 GAMECONTROLLERDB_FILE="$GAMECONTROLLERDB_DIR/gamecontrollerdb.txt"
 
 mkdir -p "$GAMECONTROLLERDB_DIR"
-touch "$GAMECONTROLLERDB_FILE"
+cp "$SCRIPT_DIR/gamecontrollerdb.txt" "$GAMECONTROLLERDB_FILE"
 
-if ! grep -q "03006d4b790000004e95000010010000" "$GAMECONTROLLERDB_FILE"; then
-    cat >> "$GAMECONTROLLERDB_FILE" << 'EOF'
-03006d4b790000004e95000010010000,ShanWan Hyperkin Adapter,a:b1,b:b2,start:b9,leftshoulder:b7,rightshoulder:b5,lefttrigger:b4,leftx:a0,lefty:a1,rightx:a5,righty:a2,dpup:b12,dpdown:b14,dpleft:b15,dpright:b13,platform:Linux,
-EOF
-fi
-
-info "gamecontrollerdb.txt updated at $GAMECONTROLLERDB_FILE"
+info "gamecontrollerdb.txt installed to $GAMECONTROLLERDB_FILE"
 
 # =============================================================================
 # Step 3: Flatpak SDL2 mapping environment override
@@ -172,8 +151,6 @@ fi
 
 info "Fixing RetroArch autoconfig directory path..."
 
-RETROARCH_CFG="$HOME/.var/app/net.retrodeck.retrodeck/config/retroarch/retroarch.cfg"
-
 if [ -f "$RETROARCH_CFG" ]; then
     if grep -q '^joypad_autoconfig_dir = ' "$RETROARCH_CFG"; then
         sed -i \
@@ -203,7 +180,7 @@ echo "  1. Flatpak override: devices=input"
 echo "  2. SDL2 mapping:     $GAMECONTROLLERDB_FILE"
 echo "  3. Flatpak override: SDL_GAMECONTROLLERCONFIG_FILE"
 echo "  4. RetroArch config: $RETROARCH_AUTOCONFIG_DIR/ShanWan Hyperkin Adapter.cfg"
-echo "  5  Player 1 retroarch.cfg bindings deleted"
+echo "  5. Player 1 retroarch.cfg bindings deleted"
 echo "  6. retroarch.cfg:    joypad_autoconfig_dir -> /var/config/retroarch/autoconfig"
 echo ""
 echo "Notes:"
